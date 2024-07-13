@@ -65,9 +65,9 @@ public class InMemoryItemRepository implements ItemRepository {
         }
 
         return items.values().stream()
-                .filter(item -> item.getName().toLowerCase().contains(text)
+                .filter(item -> (item.getName().toLowerCase().contains(text)
                         || item.getDescription().toLowerCase().contains(text))
-                .filter(Item::getAvailable)
+                        && item.getAvailable())
                 .map(ItemMapper::itemToDTO)
                 .collect(Collectors.toList());
     }
