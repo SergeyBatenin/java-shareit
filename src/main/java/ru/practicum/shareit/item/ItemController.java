@@ -1,6 +1,5 @@
 package ru.practicum.shareit.item;
 
-import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
@@ -20,6 +19,8 @@ import ru.practicum.shareit.item.service.ItemService;
 
 import java.util.Collection;
 
+import static ru.practicum.shareit.constants.UserIdHttpHeader.USER_ID_HEADER;
+
 
 @RestController
 @RequestMapping("/items")
@@ -30,8 +31,7 @@ public class ItemController {
 
     @PostMapping
     public ItemDto create(@Validated @RequestBody ItemDto itemDto,
-                          @NotNull
-                          @RequestHeader("X-Sharer-User-Id") Long userId) {
+                          @RequestHeader(USER_ID_HEADER) Long userId) {
         log.info("POST /items request: {}", itemDto);
         Item item = ItemMapper.dtoToItem(itemDto);
         item.setOwnerId(userId);
@@ -43,8 +43,7 @@ public class ItemController {
     @PatchMapping("/{itemId}")
     public ItemDto update(@RequestBody ItemDto itemDto,
                           @PathVariable long itemId,
-                          @NotNull
-                          @RequestHeader("X-Sharer-User-Id") Long userId) {
+                          @RequestHeader(USER_ID_HEADER) Long userId) {
         log.info("PATCH /items/{}, userId={} request: {}", itemId, userId, itemDto);
         Item item = ItemMapper.dtoToItem(itemDto);
         ItemDto updatedItem = itemService.update(item, itemId, userId);
@@ -61,7 +60,7 @@ public class ItemController {
     }
 
     @GetMapping
-    public Collection<ItemDto> getByOwner(@NotNull @RequestHeader("X-Sharer-User-Id") Long userId) {
+    public Collection<ItemDto> getByOwner(@RequestHeader(USER_ID_HEADER) Long userId) {
         log.info("GET /items, ownerId={} request", userId);
         Collection<ItemDto> itemsDto = itemService.getByOwner(userId);
         log.info("GET /items, ownerId={} response: {}", userId, itemsDto.size());
