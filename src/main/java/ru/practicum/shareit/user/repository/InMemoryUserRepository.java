@@ -6,6 +6,7 @@ import ru.practicum.shareit.user.User;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -36,7 +37,6 @@ public class InMemoryUserRepository implements UserRepository {
 		if (user.getName() != null) {
 			updatedUser.setName(user.getName());
 		}
-		users.put(userId, updatedUser);
 
 		return updatedUser;
 	}
@@ -61,6 +61,6 @@ public class InMemoryUserRepository implements UserRepository {
 
 	@Override
 	public Collection<User> getAll() {
-		return users.values();
+		return List.copyOf(users.values());
 	}
 }
