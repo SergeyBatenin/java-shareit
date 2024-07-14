@@ -5,9 +5,12 @@ import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ItemMapper;
 import ru.practicum.shareit.item.model.Item;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -16,12 +19,17 @@ import java.util.stream.Collectors;
 public class InMemoryItemRepository implements ItemRepository {
     private static long identifier = 1;
     private final Map<Long, Item> items = new HashMap<>();
+    private final Map<Long, List<Item>> userItemIndex = new LinkedHashMap<>();
 
     @Override
     public Item create(Item item) {
         item.setId(identifier);
         items.put(identifier, item);
         identifier++;
+
+        final List<Item> userItems = userItemIndex.computeIfAbsent(item.getOwnerId(), k -> new ArrayList<>());
+        userItems.add(item);
+
         return item;
     }
 
@@ -30,19 +38,17 @@ public class InMemoryItemRepository implements ItemRepository {
         long itemId = item.getId();
         Item updatedItem = items.get(itemId);
 
-        if (item.getName() != null) {
+        if (item.getName() != null && !item.getName().isBlank()) {
             updatedItem.setName(item.getName());
         }
-        if (item.getDescription() != null) {
+        if (item.getDescription() != null && !item.getDescription().isBlank()) {
             updatedItem.setDescription(item.getDescription());
         }
         if (item.getAvailable() != null) {
             updatedItem.setAvailable(item.getAvailable());
         }
 
-        items.put(updatedItem.getId(), updatedItem);
-
-        return items.get(itemId);
+        return updatedItem;
     }
 
     @Override
@@ -52,9 +58,8 @@ public class InMemoryItemRepository implements ItemRepository {
 
     @Override
     public Collection<ItemDto> getByOwner(long userId) {
-        return items.values().stream()
-                .filter(item -> item.getOwnerId() == userId)
-                .map(ItemMapper::itemToDTO)
+        return userItemIndex.get(userId)
+                .stream().map(ItemMapper::itemToDTO)
                 .collect(Collectors.toList());
     }
 
