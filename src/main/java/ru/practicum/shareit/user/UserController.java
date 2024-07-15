@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import ru.practicum.shareit.user.dto.UserDto;
+import ru.practicum.shareit.user.dto.UserMapper;
 import ru.practicum.shareit.user.service.UserService;
 
 import java.util.Collection;
@@ -26,17 +28,19 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping
-    public User create(@Validated @RequestBody User user) {
-        log.info("POST /users request: {}", user);
-        User createdUser = userService.create(user);
+    public UserDto create(@Validated @RequestBody UserDto userDto) {
+        log.info("POST /users request: {}", userDto);
+        User user = UserMapper.dtoToUser(userDto);
+        UserDto createdUser = userService.create(user);
         log.info("POST /users response: {}", createdUser);
         return createdUser;
     }
 
     @PatchMapping("/{userId}")
-    public User update(@RequestBody User user, @PathVariable long userId) {
-        log.info("PATCH /users/{} request: {}", userId, user);
-        User updatedUser = userService.update(user, userId);
+    public UserDto update(@RequestBody UserDto userDto, @PathVariable long userId) {
+        log.info("PATCH /users/{} request: {}", userId, userDto);
+        User user = UserMapper.dtoToUser(userDto);
+        UserDto updatedUser = userService.update(user, userId);
         log.info("PATCH /users/{} response: {}", userId, updatedUser);
         return updatedUser;
     }
@@ -50,17 +54,17 @@ public class UserController {
     }
 
     @GetMapping("/{userId}")
-    public User getById(@PathVariable long userId) {
+    public UserDto getById(@PathVariable long userId) {
         log.info("GET /users/{} request", userId);
-        User user = userService.getById(userId);
+        UserDto user = userService.getById(userId);
         log.info("GET /users/{} response: {}", userId, user);
         return user;
     }
 
     @GetMapping
-    public Collection<User> getAll() {
+    public Collection<UserDto> getAll() {
         log.info("GET /users request");
-        Collection<User> users = userService.getAll();
+        Collection<UserDto> users = userService.getAll();
         log.info("GET /users response: {}", users.size());
         return users;
     }

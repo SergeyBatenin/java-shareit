@@ -6,9 +6,12 @@ import org.springframework.stereotype.Service;
 import ru.practicum.shareit.exception.EmailExistException;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.user.User;
+import ru.practicum.shareit.user.dto.UserDto;
+import ru.practicum.shareit.user.dto.UserMapper;
 import ru.practicum.shareit.user.repository.UserRepository;
 
 import java.util.Collection;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -17,13 +20,13 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
 
     @Override
-    public User create(User user) {
+    public UserDto create(User user) {
         checkUserEmailAvailability(user.getEmail());
-        return userRepository.create(user);
+        return UserMapper.userToDto(userRepository.create(user));
     }
 
     @Override
-    public User update(User user, long userId) {
+    public UserDto update(User user, long userId) {
         User updatedUser = userRepository.getById(userId)
                 .orElseThrow(() -> {
                     log.debug("UPDATE USER By ID={}. Пользователь с айди {} не найден", userId, userId);
@@ -32,7 +35,7 @@ public class UserServiceImpl implements UserService {
         if (!updatedUser.getEmail().equals(user.getEmail())) {
             checkUserEmailAvailability(user.getEmail());
         }
-        return userRepository.update(user, userId);
+        return UserMapper.userToDto(userRepository.update(user, userId));
     }
 
     @Override
@@ -41,17 +44,21 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User getById(long userId) {
-        return userRepository.getById(userId)
+    public UserDto getById(long userId) {
+        User user = userRepository.getById(userId)
                 .orElseThrow(() -> {
                     log.debug("GET USER By ID={}. Пользователь с айди {} не найден", userId, userId);
                     return new NotFoundException("Пользователь с id=" + userId + " не существует");
                 });
+
+        return UserMapper.userToDto(user);
     }
 
     @Override
-    public Collection<User> getAll() {
-        return userRepository.getAll();
+    public Collection<UserDto> getAll() {
+        return userRepository.getAll().stream()
+                .map(UserMapper::userToDto)
+                .collect(Collectors.toList());
     }
 
     private void checkUserEmailAvailability(String email) {
