@@ -22,7 +22,7 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public ItemDto create(Item item) {
-        long ownerId = item.getOwnerId();
+        long ownerId = item.getOwner().getId();
         userRepository.getById(ownerId)
                 .orElseThrow(() -> {
                     log.debug("CREATE ITEM. Пользователь с айди {} не найден", ownerId);
@@ -39,7 +39,7 @@ public class ItemServiceImpl implements ItemService {
                     log.debug("UPDATE ITEM By ID={}. Вещь с айди {} не найден", itemId, itemId);
                     return new NotFoundException("Вещь с id=" + itemId + " не существует");
                 });
-        if (updatedItem.getOwnerId() != userId) {
+        if (updatedItem.getOwner().getId() != userId) {
             throw new UnauthorizedModificationItem("Менять описание вещи может только владелец");
         }
         item.setId(itemId);

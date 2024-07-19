@@ -27,7 +27,7 @@ public class InMemoryItemRepository implements ItemRepository {
         items.put(identifier, item);
         identifier++;
 
-        final List<Item> userItems = userItemIndex.computeIfAbsent(item.getOwnerId(), k -> new ArrayList<>());
+        final List<Item> userItems = userItemIndex.computeIfAbsent(item.getOwner().getId(), k -> new ArrayList<>());
         userItems.add(item);
 
         return item;

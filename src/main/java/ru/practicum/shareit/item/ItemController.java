@@ -34,7 +34,7 @@ public class ItemController {
                           @RequestHeader(USER_ID_HEADER) Long userId) {
         log.info("POST /items request: {}", itemDto);
         Item item = ItemMapper.dtoToItem(itemDto);
-        item.setOwnerId(userId);
+        item.getOwner().setId(userId);
         ItemDto createdItem = itemService.create(item);
         log.info("POST /items response: {}", createdItem);
         return createdItem;
