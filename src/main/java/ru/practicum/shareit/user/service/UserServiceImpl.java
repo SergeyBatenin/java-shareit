@@ -3,7 +3,7 @@ package ru.practicum.shareit.user.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import ru.practicum.shareit.exception.EmailExistException;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.user.User;
 import ru.practicum.shareit.user.dto.UserDto;
@@ -18,54 +18,52 @@ import java.util.stream.Collectors;
 @Slf4j
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
+    private final UserMapper mapper;
 
-    @Override
-    public UserDto create(User user) {
-        checkUserEmailAvailability(user.getEmail());
-        return UserMapper.userToDto(userRepository.create(user));
+    @Transactional
+    public UserDto create(UserDto userDto) {
+//        checkUserEmailAvailability(user.getEmail());
+        User user = mapper.dtoToUser(userDto);
+        return mapper.userToDto(userRepository.save(user));
     }
 
-    @Override
-    public UserDto update(User user, long userId) {
-        User updatedUser = userRepository.getById(userId)
+    @Transactional
+    public UserDto update(UserDto userDto, long userId) {
+        User updatedUser = userRepository.findById(userId)
                 .orElseThrow(() -> {
                     log.debug("UPDATE USER By ID={}. Пользователь с айди {} не найден", userId, userId);
                     return new NotFoundException("Пользователь с id=" + userId + " не существует");
                 });
-        if (!updatedUser.getEmail().equals(user.getEmail())) {
-            checkUserEmailAvailability(user.getEmail());
+
+        if (userDto.getEmail() != null && !userDto.getEmail().isBlank()) {
+            updatedUser.setEmail(userDto.getEmail());
         }
-        return UserMapper.userToDto(userRepository.update(user, userId));
+        if (userDto.getName() != null && !userDto.getName().isBlank()) {
+            updatedUser.setName(userDto.getName());
+        }
+        return mapper.userToDto(userRepository.save(updatedUser));
     }
 
-    @Override
+    @Transactional
     public void delete(long userId) {
-        userRepository.delete(userId);
+        userRepository.deleteById(userId);
     }
 
-    @Override
+    @Transactional(readOnly = true)
     public UserDto getById(long userId) {
-        User user = userRepository.getById(userId)
+        User user = userRepository.findById(userId)
                 .orElseThrow(() -> {
                     log.debug("GET USER By ID={}. Пользователь с айди {} не найден", userId, userId);
                     return new NotFoundException("Пользователь с id=" + userId + " не существует");
                 });
 
-        return UserMapper.userToDto(user);
+        return mapper.userToDto(user);
     }
 
-    @Override
+    @Transactional(readOnly = true)
     public Collection<UserDto> getAll() {
-        return userRepository.getAll().stream()
-                .map(UserMapper::userToDto)
+        return userRepository.findAll().stream()
+                .map(mapper::userToDto)
                 .collect(Collectors.toList());
-    }
-
-    private void checkUserEmailAvailability(String email) {
-        boolean emailAvailability = userRepository.isEmailAvailability(email);
-        if (!emailAvailability) {
-            log.debug("Электронный адрес '{}' уже зарегистрирован", email);
-            throw new EmailExistException("Электронный адрес '" + email + "' уже зарегистрирован");
-        }
     }
 }

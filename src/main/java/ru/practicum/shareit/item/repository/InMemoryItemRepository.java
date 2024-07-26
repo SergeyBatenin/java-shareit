@@ -1,6 +1,5 @@
 package ru.practicum.shareit.item.repository;
 
-import org.springframework.stereotype.Repository;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ItemMapper;
 import ru.practicum.shareit.item.model.Item;
@@ -15,13 +14,13 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-@Repository
-public class InMemoryItemRepository implements ItemRepository {
+
+public class InMemoryItemRepository {
     private static long identifier = 1;
     private final Map<Long, Item> items = new HashMap<>();
     private final Map<Long, List<Item>> userItemIndex = new LinkedHashMap<>();
+    private final ItemMapper mapper = new ItemMapper();
 
-    @Override
     public Item create(Item item) {
         item.setId(identifier);
         items.put(identifier, item);
@@ -33,7 +32,6 @@ public class InMemoryItemRepository implements ItemRepository {
         return item;
     }
 
-    @Override
     public Item update(Item item) {
         long itemId = item.getId();
         Item updatedItem = items.get(itemId);
@@ -51,19 +49,16 @@ public class InMemoryItemRepository implements ItemRepository {
         return updatedItem;
     }
 
-    @Override
     public Optional<Item> getById(long itemId) {
         return Optional.ofNullable(items.get(itemId));
     }
 
-    @Override
     public Collection<ItemDto> getByOwner(long userId) {
         return userItemIndex.get(userId)
-                .stream().map(ItemMapper::itemToDTO)
+                .stream().map(mapper::itemToDTO)
                 .collect(Collectors.toList());
     }
 
-    @Override
     public Collection<ItemDto> search(String text) {
         if (text.isBlank()) {
             return Collections.emptyList();
@@ -73,7 +68,7 @@ public class InMemoryItemRepository implements ItemRepository {
                 .filter(item -> (item.getName().toLowerCase().contains(text)
                         || item.getDescription().toLowerCase().contains(text))
                         && item.getAvailable())
-                .map(ItemMapper::itemToDTO)
+                .map(mapper::itemToDTO)
                 .collect(Collectors.toList());
     }
 }

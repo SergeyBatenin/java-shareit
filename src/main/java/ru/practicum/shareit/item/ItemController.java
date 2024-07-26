@@ -13,8 +13,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import ru.practicum.shareit.item.dto.ItemDto;
-import ru.practicum.shareit.item.dto.ItemMapper;
-import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.service.ItemService;
 
 import java.util.Collection;
@@ -33,9 +31,7 @@ public class ItemController {
     public ItemDto create(@Validated @RequestBody ItemDto itemDto,
                           @RequestHeader(USER_ID_HEADER) Long userId) {
         log.info("POST /items request: {}", itemDto);
-        Item item = ItemMapper.dtoToItem(itemDto);
-        item.getOwner().setId(userId);
-        ItemDto createdItem = itemService.create(item);
+        ItemDto createdItem = itemService.create(itemDto, userId);
         log.info("POST /items response: {}", createdItem);
         return createdItem;
     }
@@ -45,8 +41,8 @@ public class ItemController {
                           @PathVariable long itemId,
                           @RequestHeader(USER_ID_HEADER) Long userId) {
         log.info("PATCH /items/{}, userId={} request: {}", itemId, userId, itemDto);
-        Item item = ItemMapper.dtoToItem(itemDto);
-        ItemDto updatedItem = itemService.update(item, itemId, userId);
+        itemDto.setId(itemId);
+        ItemDto updatedItem = itemService.update(itemDto, userId);
         log.info("PATCH /items/{}, userId={} response: {}", itemId, userId, itemDto);
         return updatedItem;
     }

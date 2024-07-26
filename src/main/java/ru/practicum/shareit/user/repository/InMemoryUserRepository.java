@@ -1,6 +1,5 @@
 package ru.practicum.shareit.user.repository;
 
-import org.springframework.stereotype.Repository;
 import ru.practicum.shareit.user.User;
 
 import java.util.Collection;
@@ -11,13 +10,12 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
-@Repository
-public class InMemoryUserRepository implements UserRepository {
+public class InMemoryUserRepository {
     private static long identifier = 1;
     private final Map<Long, User> users = new HashMap<>();
     private final Set<String> emails = new HashSet<>();
 
-    @Override
+
     public User create(User user) {
         user.setId(identifier);
         users.put(identifier, user);
@@ -26,7 +24,6 @@ public class InMemoryUserRepository implements UserRepository {
         return user;
     }
 
-    @Override
     public User update(User user, long userId) {
         User updatedUser = users.get(userId);
         if (user.getEmail() != null && !user.getEmail().isBlank()) {
@@ -41,7 +38,6 @@ public class InMemoryUserRepository implements UserRepository {
         return updatedUser;
     }
 
-    @Override
     public void delete(long userId) {
         User removedUser = users.remove(userId);
         if (removedUser != null) {
@@ -49,17 +45,14 @@ public class InMemoryUserRepository implements UserRepository {
         }
     }
 
-    @Override
     public Optional<User> getById(long userId) {
         return Optional.ofNullable(users.get(userId));
     }
 
-    @Override
     public boolean isEmailAvailability(String email) {
         return !emails.contains(email);
     }
 
-    @Override
     public Collection<User> getAll() {
         return List.copyOf(users.values());
     }

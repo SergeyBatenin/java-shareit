@@ -1,9 +1,9 @@
 package ru.practicum.shareit.user.dto;
 
-import lombok.experimental.UtilityClass;
+import org.springframework.stereotype.Component;
 import ru.practicum.shareit.user.User;
 
-@UtilityClass
+@Component
 public class UserMapper {
     public UserDto userToDto(User user) {
         return new UserDto(user.getId(), user.getName(), user.getEmail());
