@@ -1,6 +1,7 @@
 package ru.practicum.shareit.exception;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -18,23 +19,24 @@ public class ExceptionController {
                 .body(new ErrorMessage(exception.getMessage()));
     }
 
-    @ExceptionHandler(EmailExistException.class)
-    public ResponseEntity<ErrorMessage> handleEmailExist(EmailExistException exception) {
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<ErrorMessage> handleEmailExist(DataIntegrityViolationException exception) {
         log.error("ERROR", exception);
         return ResponseEntity
                 .status(HttpStatus.CONFLICT)
                 .body(new ErrorMessage(exception.getMessage()));
     }
 
-    @ExceptionHandler(UnauthorizedModificationItem.class)
-    public ResponseEntity<ErrorMessage> handleUnauthorized(UnauthorizedModificationItem exception) {
+    @ExceptionHandler(UnauthorizedModification.class)
+    public ResponseEntity<ErrorMessage> handleUnauthorized(UnauthorizedModification exception) {
         log.error("ERROR", exception);
         return ResponseEntity
                 .status(HttpStatus.FORBIDDEN)
                 .body(new ErrorMessage(exception.getMessage()));
     }
 
-    @ExceptionHandler({MethodArgumentNotValidException.class, IllegalArgumentException.class})
+    @ExceptionHandler({MethodArgumentNotValidException.class, IllegalArgumentException.class,
+            ItemAvailableException.class, AccessException.class})
     public ResponseEntity<ErrorMessage> handleMethodArgumentNotValid(Exception exception) {
         log.error("ERROR", exception);
         return ResponseEntity
