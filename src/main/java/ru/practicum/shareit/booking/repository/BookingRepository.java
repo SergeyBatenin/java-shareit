@@ -8,6 +8,7 @@ import ru.practicum.shareit.booking.model.Booking;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 
 @SuppressWarnings("checkstyle:Regexp")
 @Repository
@@ -33,4 +34,8 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
     List<Booking> findBookingsByItemOwnerIdAndStatusOrderByStartDesc(long ownerId, BookingStatus status);
 
     List<Booking> findAllByItemOwnerIdOrderByStartDesc(long ownerId);
+
+    List<Booking> findByItemIdInAndStatus(Set<Long> itemIds, BookingStatus status);
+
+    List<Booking> findByItemIdAndStatus(long itemId, BookingStatus status);
 }

@@ -56,11 +56,15 @@ public class BookingController {
     }
 
     @GetMapping
-    public Collection<Booking> getByUser(@RequestParam(required = false, defaultValue = "ALL") BookingState state,
+    public Collection<Booking> getByUser(@RequestParam(required = false, defaultValue = "ALL") String stateValue,
                                             @RequestHeader(USER_ID_HEADER) long userId) {
-        log.info("GET BY USER /bookings/{} request", state);
+        log.info("GET BY USER /bookings/{} request", stateValue);
+        BookingState state = BookingState.from(stateValue);
+        if (state == null) {
+            throw new IllegalArgumentException("Unknown state: " + stateValue);
+        }
         Collection<Booking> booking = bookingService.getByUser(state, userId);
-        log.info("GET BY USER /bookings/{} response: {}", state, booking.size());
+        log.info("GET BY USER /bookings/{} response: {}", stateValue, booking.size());
         return booking;
     }
 

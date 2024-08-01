@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.item.dto.ItemInfoDto;
 import ru.practicum.shareit.item.service.ItemService;
 
 import java.util.Collection;
@@ -48,17 +49,17 @@ public class ItemController {
     }
 
     @GetMapping("/{itemId}")
-    public ItemDto getById(@PathVariable long itemId) {
+    public ItemInfoDto getById(@PathVariable long itemId, @RequestHeader(USER_ID_HEADER) Long userId) {
         log.info("GET /items/{} request", itemId);
-        ItemDto itemDto = itemService.getById(itemId);
+        ItemInfoDto itemDto = itemService.getById(itemId, userId);
         log.info("GET /items/{} response: {}", itemId, itemDto);
         return itemDto;
     }
 
     @GetMapping
-    public Collection<ItemDto> getByOwner(@RequestHeader(USER_ID_HEADER) Long userId) {
+    public Collection<ItemInfoDto> getByOwner(@RequestHeader(USER_ID_HEADER) Long userId) {
         log.info("GET /items, ownerId={} request", userId);
-        Collection<ItemDto> itemsDto = itemService.getByOwner(userId);
+        Collection<ItemInfoDto> itemsDto = itemService.getByOwner(userId);
         log.info("GET /items, ownerId={} response: {}", userId, itemsDto.size());
         return itemsDto;
     }
