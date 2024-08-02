@@ -9,6 +9,7 @@ import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.dto.BookingMapper;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.repository.BookingRepository;
+import ru.practicum.shareit.exception.AccessException;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.exception.UnauthorizedModification;
 import ru.practicum.shareit.item.dto.CommentDto;
@@ -16,6 +17,7 @@ import ru.practicum.shareit.item.dto.CommentMapper;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ItemInfoDto;
 import ru.practicum.shareit.item.dto.ItemMapper;
+import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.CommentRepository;
 import ru.practicum.shareit.item.repository.ItemRepository;
@@ -45,6 +47,7 @@ public class ItemServiceImpl implements ItemService {
     private final BookingMapper bookingMapper;
 
     @Transactional
+    @Override
     public ItemDto create(ItemDto itemDto, long ownerId) {
         User user = userRepository.findById(ownerId)
                 .orElseThrow(() -> {
@@ -56,6 +59,7 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Transactional
+    @Override
     public ItemDto update(ItemDto itemDto, long ownerId) {
         long itemId = itemDto.getId();
         Item updatedItem = itemRepository.findById(itemId)
@@ -81,6 +85,7 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Transactional(readOnly = true)
+    @Override
     public ItemInfoDto getById(long itemId, long userId) {
         Item item = itemRepository.findById(itemId)
                 .orElseThrow(() -> {
@@ -119,6 +124,7 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Transactional(readOnly = true)
+    @Override
     public Collection<ItemInfoDto> getByOwner(long ownerId) {
         userRepository.findById(ownerId)
                 .orElseThrow(() -> {
@@ -135,7 +141,7 @@ public class ItemServiceImpl implements ItemService {
         Map<Long, List<CommentDto>> comments = commentRepository.findByItemIdIn(items.keySet()).stream()
                 .map(commentMapper::commentToDto)
                 .collect(Collectors.groupingBy(CommentDto::getItemId));
-        // выгружаем ,бронирования (ещё один запрос)
+        // выгружаем бронирования (ещё один запрос)
         Map<Long, List<Booking>> bookings = bookingRepository.findByItemIdInAndStatus(items.keySet(), BookingStatus.APPROVED)
                 .stream()
                 .collect(Collectors.groupingBy(booking -> booking.getItem().getId()));
@@ -152,11 +158,28 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Transactional(readOnly = true)
+    @Override
     public Collection<ItemDto> search(String text) {
         if (text.isBlank()) {
             return Collections.emptyList();
         }
         return itemRepository.search(text.toLowerCase()).stream()
                 .map(itemMapper::itemToDTO).collect(Collectors.toList());
+    }
+
+    @Transactional
+    @Override
+    public CommentDto addComment(CommentDto commentDto, Long authorId) {
+        List<Booking> booking = bookingRepository.findByItemIdAndBookerIdAndEndBefore(
+                commentDto.getItemId(),
+                authorId,
+                LocalDateTime.now());
+
+        if (booking.isEmpty()) {
+            throw new AccessException("Комментарии доступны пользователям, которые пользовались вещью");
+        }
+        commentDto.setCreated(LocalDateTime.now());
+        Comment comment = commentMapper.dtoToComment(commentDto, booking.getFirst().getItem(), booking.getFirst().getBooker());
+        return commentMapper.commentToDto(commentRepository.save(comment));
     }
 }
