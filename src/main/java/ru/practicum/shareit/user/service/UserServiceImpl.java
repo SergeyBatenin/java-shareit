@@ -22,7 +22,6 @@ public class UserServiceImpl implements UserService {
 
     @Transactional
     public UserDto create(UserDto userDto) {
-//        checkUserEmailAvailability(user.getEmail());
         User user = mapper.dtoToUser(userDto);
         return mapper.userToDto(userRepository.save(user));
     }
