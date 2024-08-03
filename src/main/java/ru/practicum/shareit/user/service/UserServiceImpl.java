@@ -21,12 +21,14 @@ public class UserServiceImpl implements UserService {
     private final UserMapper mapper;
 
     @Transactional
+    @Override
     public UserDto create(UserDto userDto) {
         User user = mapper.dtoToUser(userDto);
         return mapper.userToDto(userRepository.save(user));
     }
 
     @Transactional
+    @Override
     public UserDto update(UserDto userDto, long userId) {
         User updatedUser = userRepository.findById(userId)
                 .orElseThrow(() -> {
@@ -44,11 +46,13 @@ public class UserServiceImpl implements UserService {
     }
 
     @Transactional
+    @Override
     public void delete(long userId) {
         userRepository.deleteById(userId);
     }
 
     @Transactional(readOnly = true)
+    @Override
     public UserDto getById(long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> {
@@ -60,6 +64,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Transactional(readOnly = true)
+    @Override
     public Collection<UserDto> getAll() {
         return userRepository.findAll().stream()
                 .map(mapper::userToDto)
