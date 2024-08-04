@@ -45,7 +45,7 @@ public class ExceptionController {
 
     @ExceptionHandler({MethodArgumentNotValidException.class, IllegalArgumentException.class,
             ItemAvailableException.class, AccessException.class})
-    public ResponseEntity<ErrorMessage> handleMethodArgumentNotValid(RuntimeException exception) {
+    public ResponseEntity<ErrorMessage> handleMethodArgumentNotValid(Exception exception) {
         log.error("ERROR", exception);
         final ByteArrayOutputStream out = getOutputStream(exception);
         return ResponseEntity
