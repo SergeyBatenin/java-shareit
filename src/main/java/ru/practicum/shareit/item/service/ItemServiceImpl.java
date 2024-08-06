@@ -14,6 +14,7 @@ import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.exception.UnauthorizedModification;
 import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.dto.CommentMapper;
+import ru.practicum.shareit.item.dto.CommentCreateDto;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ItemInfoDto;
 import ru.practicum.shareit.item.dto.ItemMapper;
@@ -81,7 +82,7 @@ public class ItemServiceImpl implements ItemService {
             updatedItem.setAvailable(itemDto.getAvailable());
         }
 
-        return itemMapper.itemToDTO(itemRepository.save(updatedItem));
+        return itemMapper.itemToDTO(updatedItem);
     }
 
     @Transactional(readOnly = true)
@@ -169,7 +170,7 @@ public class ItemServiceImpl implements ItemService {
 
     @Transactional
     @Override
-    public CommentDto addComment(CommentDto commentDto, Long authorId) {
+    public CommentDto addComment(CommentCreateDto commentDto, Long authorId) {
         List<Booking> booking = bookingRepository.findByItemIdAndBookerIdAndEndBefore(
                 commentDto.getItemId(),
                 authorId,
@@ -178,8 +179,8 @@ public class ItemServiceImpl implements ItemService {
         if (booking.isEmpty()) {
             throw new AccessException("Комментарии доступны пользователям, которые пользовались вещью");
         }
-        commentDto.setCreated(LocalDateTime.now());
-        Comment comment = commentMapper.dtoToComment(commentDto, booking.getFirst().getItem(), booking.getFirst().getBooker());
+
+        Comment comment = commentMapper.createdDtoToComment(commentDto, booking.getFirst().getItem(), booking.getFirst().getBooker());
         return commentMapper.commentToDto(commentRepository.save(comment));
     }
 }
