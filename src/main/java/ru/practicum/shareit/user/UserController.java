@@ -31,7 +31,6 @@ public class UserController {
     @PostMapping
     public UserDto create(@Validated(Create.class) @RequestBody UserDto userDto) {
         log.info("POST /users request: {}", userDto);
-//        User user = UserMapper.dtoToUser(userDto);
         UserDto createdUser = userService.create(userDto);
         log.info("POST /users response: {}", createdUser);
         return createdUser;
@@ -40,7 +39,6 @@ public class UserController {
     @PatchMapping("/{userId}")
     public UserDto update(@Validated(Update.class) @RequestBody UserDto userDto, @PathVariable long userId) {
         log.info("PATCH /users/{} request: {}", userId, userDto);
-//        User user = UserMapper.dtoToUser(userDto);
         UserDto updatedUser = userService.update(userDto, userId);
         log.info("PATCH /users/{} response: {}", userId, updatedUser);
         return updatedUser;
