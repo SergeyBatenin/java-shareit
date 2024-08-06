@@ -2,7 +2,9 @@ package ru.practicum.shareit.booking.dto;
 
 import org.springframework.stereotype.Component;
 import ru.practicum.shareit.booking.model.Booking;
+import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.model.Item;
+import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.model.User;
 
 @Component
@@ -18,6 +20,17 @@ public class BookingMapper {
         );
     }
 
+    public BookingFullDto bookingToFullDto(Booking booking, ItemDto item, UserDto booker) {
+        return new BookingFullDto(
+                booking.getId(),
+                booking.getStart(),
+                booking.getEnd(),
+                item,
+                booker,
+                booking.getStatus()
+        );
+    }
+
     public Booking dtoToBooking(BookingDto dto, Item item, User user) {
         return new Booking(
                 dto.getId(),
@@ -26,7 +39,6 @@ public class BookingMapper {
                 item,
                 user,
                 dto.getStatus()
-//                BookingStatus.WAITING // или брать у дто...
         );
     }
 }
