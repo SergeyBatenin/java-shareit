@@ -5,6 +5,8 @@ import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.model.User;
 
+import java.time.LocalDateTime;
+
 @Component
 public class CommentMapper {
     public CommentDto commentToDto(Comment comment) {
@@ -16,12 +18,12 @@ public class CommentMapper {
                 comment.getCreated());
     }
 
-    public Comment dtoToComment(CommentDto dto, Item item, User author) {
-        return new Comment(
-                dto.getId(),
-                dto.getText(),
-                item,
-                author,
-                dto.getCreated());
+    public Comment createdDtoToComment(CommentCreateDto dto, Item item, User author) {
+        Comment comment = new Comment();
+        comment.setText(dto.getText());
+        comment.setItem(item);
+        comment.setAuthor(author);
+        comment.setCreated(LocalDateTime.now());
+        return comment;
     }
 }
