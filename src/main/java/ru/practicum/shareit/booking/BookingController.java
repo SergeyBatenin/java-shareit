@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.dto.BookingFullDto;
-import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.service.BookingService;
 
 import java.util.Collection;
@@ -40,8 +39,8 @@ public class BookingController {
 
     @PatchMapping("/{bookingId}")
     public BookingFullDto approve(@PathVariable long bookingId,
-                              @RequestParam boolean approved,
-                              @RequestHeader(USER_ID_HEADER) long userId) {
+                                  @RequestParam boolean approved,
+                                  @RequestHeader(USER_ID_HEADER) long userId) {
         log.info("PATCH /bookings/{}/{} request", bookingId, approved);
         BookingFullDto approvedBooking = bookingService.approve(bookingId, approved, userId);
         log.info("PATCH /bookings/{}/{} response: {}", bookingId, approved, approvedBooking);
@@ -58,7 +57,7 @@ public class BookingController {
 
     @GetMapping
     public Collection<BookingFullDto> getByUser(@RequestParam(defaultValue = "ALL") String stateValue,
-                                            @RequestHeader(USER_ID_HEADER) long userId) {
+                                                @RequestHeader(USER_ID_HEADER) long userId) {
         log.info("GET BY USER /bookings/{} request", stateValue);
         BookingState state = BookingState.from(stateValue);
         if (state == null) {
@@ -71,7 +70,7 @@ public class BookingController {
 
     @GetMapping("/owner")
     public Collection<BookingFullDto> getByOwner(@RequestParam(defaultValue = "ALL") BookingState state,
-                                             @RequestHeader(USER_ID_HEADER) long userId) {
+                                                 @RequestHeader(USER_ID_HEADER) long userId) {
         log.info("GET BY OWNER /bookings/owner/{} request", state);
         Collection<BookingFullDto> bookings = bookingService.getByOwner(state, userId);
         log.info("GET BY OWNER /bookings/owner/{} response: {}", state, bookings.size());
