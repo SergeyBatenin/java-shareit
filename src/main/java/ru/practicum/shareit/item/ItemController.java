@@ -17,6 +17,8 @@ import ru.practicum.shareit.item.dto.CommentCreateDto;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ItemInfoDto;
 import ru.practicum.shareit.item.service.ItemService;
+import ru.practicum.shareit.validation.Create;
+import ru.practicum.shareit.validation.Update;
 
 import java.util.Collection;
 
@@ -31,7 +33,7 @@ public class ItemController {
     private final ItemService itemService;
 
     @PostMapping
-    public ItemDto create(@Validated @RequestBody ItemDto itemDto,
+    public ItemDto create(@Validated(Create.class) @RequestBody ItemDto itemDto,
                           @RequestHeader(USER_ID_HEADER) Long userId) {
         log.info("POST /items request: {}", itemDto);
         ItemDto createdItem = itemService.create(itemDto, userId);
@@ -40,7 +42,7 @@ public class ItemController {
     }
 
     @PatchMapping("/{itemId}")
-    public ItemDto update(@RequestBody ItemDto itemDto,
+    public ItemDto update(@Validated(Update.class) @RequestBody ItemDto itemDto,
                           @PathVariable long itemId,
                           @RequestHeader(USER_ID_HEADER) Long userId) {
         log.info("PATCH /items/{}, userId={} request: {}", itemId, userId, itemDto);
