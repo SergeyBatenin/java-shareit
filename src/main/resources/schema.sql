@@ -25,8 +25,8 @@ CREATE TABLE IF NOT EXISTS items (
     available BOOLEAN NOT NULL,
     owner_id BIGINT NOT NULL,
     request_id BIGINT,
-    FOREIGN KEY (owner_id) REFERENCES users(id) ON DELETE CASCADE
---     FOREIGN KEY (request_id) REFERENCES requests(id) ON DELETE CASCADE
+    FOREIGN KEY (owner_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (request_id) REFERENCES requests(id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS bookings (

@@ -1,4 +1,4 @@
-package ru.practicum.shareit.request;
+package ru.practicum.shareit.request.model;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -8,7 +8,9 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import ru.practicum.shareit.user.model.User;
 
@@ -18,6 +20,8 @@ import java.time.LocalDateTime;
 @Table(name = "requests")
 @Getter
 @Setter
+@AllArgsConstructor
+@NoArgsConstructor
 public class ItemRequest {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -25,9 +29,8 @@ public class ItemRequest {
     @Column(name = "description")
     private String description;
     @ManyToOne
-    @JoinColumn(name = "owner_id")
+    @JoinColumn(name = "requestor_id")
     private User requestor;
     @Column(name = "created")
     private LocalDateTime created;
-
 }

@@ -4,12 +4,16 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import ru.practicum.shareit.item.model.Item;
+import ru.practicum.shareit.request.model.ItemRequest;
 
 import java.util.List;
+import java.util.Set;
 
 @Repository
 public interface ItemRepository extends JpaRepository<Item, Long> {
     List<Item> findByOwnerId(long ownerId);
+
+    List<Item> findByRequestIn(List<ItemRequest> requestIds);
 
     @Query("SELECT it " +
             "FROM Item it " +
@@ -17,4 +21,6 @@ public interface ItemRepository extends JpaRepository<Item, Long> {
             "OR LOWER(it.description) LIKE LOWER(CONCAT('%', :text, '%'))) " +
             "AND it.available = true")
     List<Item> search(String text);
+
+    List<Item> findByRequestId(long itemRequestId);
 }

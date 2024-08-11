@@ -12,9 +12,9 @@ import ru.practicum.shareit.booking.repository.BookingRepository;
 import ru.practicum.shareit.exception.AccessException;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.exception.UnauthorizedModification;
+import ru.practicum.shareit.item.dto.CommentCreateDto;
 import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.dto.CommentMapper;
-import ru.practicum.shareit.item.dto.CommentCreateDto;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ItemInfoDto;
 import ru.practicum.shareit.item.dto.ItemMapper;
@@ -22,6 +22,8 @@ import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.CommentRepository;
 import ru.practicum.shareit.item.repository.ItemRepository;
+import ru.practicum.shareit.request.model.ItemRequest;
+import ru.practicum.shareit.request.repository.ItemRequestRepository;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 
@@ -43,6 +45,7 @@ public class ItemServiceImpl implements ItemService {
     private final UserRepository userRepository;
     private final BookingRepository bookingRepository;
     private final CommentRepository commentRepository;
+    private final ItemRequestRepository requestRepository;
     private final ItemMapper itemMapper;
     private final CommentMapper commentMapper;
     private final BookingMapper bookingMapper;
@@ -55,7 +58,15 @@ public class ItemServiceImpl implements ItemService {
                     log.debug("CREATE ITEM. Пользователь с айди {} не найден", ownerId);
                     return new NotFoundException("Пользователь с id=" + ownerId + " не существует");
                 });
-        Item item = itemMapper.dtoToItem(itemDto, user);
+        ItemRequest itemRequest = null;
+        if (itemDto.getRequestId() != null) {
+            itemRequest = requestRepository.findById(itemDto.getRequestId())
+                    .orElseThrow(() -> {
+                        log.debug("CREATE ITEM. Запрос на вещь с айди {} не найден", itemDto.getRequestId());
+                        return new NotFoundException("Запрос с id=" + itemDto.getRequestId() + " не существует");
+                    });
+        }
+        Item item = itemMapper.dtoToItem(itemDto, user, itemRequest);
         return itemMapper.itemToDTO(itemRepository.save(item));
     }
 
