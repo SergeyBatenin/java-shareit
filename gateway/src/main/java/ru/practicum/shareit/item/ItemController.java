@@ -1,5 +1,6 @@
 package ru.practicum.shareit.item;
 
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,6 +19,8 @@ import ru.practicum.shareit.item.dto.CommentCreateDto;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.validation.Create;
 import ru.practicum.shareit.validation.Update;
+
+import java.util.Collections;
 
 import static ru.practicum.shareit.constants.UserIdHttpHeader.USER_ID_HEADER;
 
@@ -64,7 +67,7 @@ public class ItemController {
     }
 
     @PostMapping("/{itemId}/comment")
-    public ResponseEntity<Object> addComment(@Validated @RequestBody CommentCreateDto commentDto,
+    public ResponseEntity<Object> addComment(@Valid @RequestBody CommentCreateDto commentDto,
                                              @PathVariable @Positive long itemId,
                                              @RequestHeader(USER_ID_HEADER) long userId) {
         log.info("Add comment {} to item with id={}, userId{}", commentDto, itemId, userId);
