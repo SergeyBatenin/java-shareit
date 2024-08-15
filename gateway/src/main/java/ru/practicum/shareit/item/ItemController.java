@@ -63,6 +63,9 @@ public class ItemController {
     public ResponseEntity<Object> searchItems(@RequestHeader(USER_ID_HEADER) long userId,
                                               @RequestParam(name = "text") String text) {
         log.info("Search items by text={}", text);
+        if (text == null || text.isBlank()) {
+            return ResponseEntity.ok(Collections.emptyList());
+        }
         return itemClient.searchItems(userId, text);
     }
 

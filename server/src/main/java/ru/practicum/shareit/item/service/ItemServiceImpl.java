@@ -172,9 +172,6 @@ public class ItemServiceImpl implements ItemService {
     @Transactional(readOnly = true)
     @Override
     public Collection<ItemDto> search(String text) {
-        if (text.isBlank()) {
-            return Collections.emptyList();
-        }
         return itemRepository.search(text.toLowerCase()).stream()
                 .map(itemMapper::itemToDTO).collect(Collectors.toList());
     }
